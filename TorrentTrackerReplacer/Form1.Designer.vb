@@ -25,7 +25,6 @@ Partial Class Form1
         Me.Label1 = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Button1 = New System.Windows.Forms.Button()
-        Me.TextBox2 = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.TextBox3 = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
@@ -36,6 +35,8 @@ Partial Class Form1
         Me.Button2 = New System.Windows.Forms.Button()
         Me.FolderBrowserDialog1 = New System.Windows.Forms.FolderBrowserDialog()
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
+        Me.TextBox2 = New System.Windows.Forms.ComboBox()
+        Me.Button3 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Label1
@@ -67,16 +68,6 @@ Partial Class Form1
         Me.Button1.Text = "..."
         Me.Button1.UseVisualStyleBackColor = True
         '
-        'TextBox2
-        '
-        Me.TextBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextBox2.Location = New System.Drawing.Point(71, 40)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(741, 21)
-        Me.TextBox2.TabIndex = 4
-        Me.TextBox2.Text = "*.torrent"
-        '
         'Label2
         '
         Me.Label2.AutoSize = True
@@ -92,7 +83,7 @@ Partial Class Form1
         Me.TextBox3.Name = "TextBox3"
         Me.TextBox3.Size = New System.Drawing.Size(350, 21)
         Me.TextBox3.TabIndex = 5
-        Me.TextBox3.Text = ".ru"
+        Me.TextBox3.Text = ".ru/"
         '
         'Label3
         '
@@ -120,7 +111,7 @@ Partial Class Form1
         Me.TextBox4.Name = "TextBox4"
         Me.TextBox4.Size = New System.Drawing.Size(362, 21)
         Me.TextBox4.TabIndex = 8
-        Me.TextBox4.Text = ".wiki"
+        Me.TextBox4.Text = ".wiki/"
         '
         'CheckBox1
         '
@@ -151,11 +142,11 @@ Partial Class Form1
         'Button2
         '
         Me.Button2.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-        Me.Button2.Location = New System.Drawing.Point(405, 507)
+        Me.Button2.Location = New System.Drawing.Point(365, 507)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(75, 23)
         Me.Button2.TabIndex = 11
-        Me.Button2.Text = "运行"
+        Me.Button2.Text = "种子修改"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'CheckBox2
@@ -169,11 +160,35 @@ Partial Class Form1
         Me.CheckBox2.Text = "子目录"
         Me.CheckBox2.UseVisualStyleBackColor = True
         '
+        'TextBox2
+        '
+        Me.TextBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBox2.FormattingEnabled = True
+        Me.TextBox2.Items.AddRange(New Object() {"*.torrent", "*.fastresume"})
+        Me.TextBox2.Location = New System.Drawing.Point(71, 41)
+        Me.TextBox2.Name = "TextBox2"
+        Me.TextBox2.Size = New System.Drawing.Size(741, 20)
+        Me.TextBox2.TabIndex = 13
+        Me.TextBox2.Text = "*.torrent"
+        '
+        'Button3
+        '
+        Me.Button3.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.Button3.Location = New System.Drawing.Point(446, 507)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(75, 23)
+        Me.Button3.TabIndex = 14
+        Me.Button3.Text = "qb恢复文件"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(884, 542)
+        Me.Controls.Add(Me.Button3)
+        Me.Controls.Add(Me.TextBox2)
         Me.Controls.Add(Me.CheckBox2)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.TextBoxInfo)
@@ -182,7 +197,6 @@ Partial Class Form1
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.TextBox3)
-        Me.Controls.Add(Me.TextBox2)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.TextBox1)
@@ -197,7 +211,6 @@ Partial Class Form1
     Friend WithEvents Label1 As Label
     Friend WithEvents TextBox1 As TextBox
     Friend WithEvents Button1 As Button
-    Friend WithEvents TextBox2 As TextBox
     Friend WithEvents Label2 As Label
     Friend WithEvents TextBox3 As TextBox
     Friend WithEvents Label3 As Label
@@ -208,4 +221,6 @@ Partial Class Form1
     Friend WithEvents Button2 As Button
     Friend WithEvents FolderBrowserDialog1 As FolderBrowserDialog
     Friend WithEvents CheckBox2 As CheckBox
+    Friend WithEvents TextBox2 As ComboBox
+    Friend WithEvents Button3 As Button
 End Class
