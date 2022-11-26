@@ -1,0 +1,1916 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BencodeNET</name>
+    </assembly>
+    <members>
+        <member name="T:BencodeNET.Exceptions.BencodeException">
+            <summary>
+            Represents generic errors in this bencode library.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Exceptions.BencodeException`1">
+            <summary>
+            Represents generic errors in this bencode library related to a specific <see cref="T:System.Type"/>.
+            </summary>
+            <typeparam name="T">The related type.</typeparam>
+        </member>
+        <member name="P:BencodeNET.Exceptions.BencodeException`1.RelatedType">
+            <summary>
+            The type related to this error. Usually the type being parsed.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Exceptions.InvalidBencodeException`1">
+            <summary>
+            Represents parse errors when encountering invalid bencode of some sort.
+            </summary>
+            <typeparam name="T">The type being parsed.</typeparam>
+        </member>
+        <member name="P:BencodeNET.Exceptions.InvalidBencodeException`1.StreamPosition">
+            <summary>
+            The position in the stream where the error happened or
+            the starting position of the parsed object that caused the error.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Exceptions.UnsupportedBencodeException`1">
+            <summary>
+            Represents parse errors for when encountering bencode that is potentially valid but not supported by this library.
+            Usually numbers larger than <see cref="F:System.Int64.MaxValue"/> or strings longer than that.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:BencodeNET.IO.BencodeReader">
+            <summary>
+            Reads bencode from a stream.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.BencodeReader.PreviousChar">
+            <summary>
+            The previously read/consumed char (does not include peeked char).
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.BencodeReader.Position">
+            <summary>
+            The position in the stream (does not included peeked char).
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.BencodeReader.Length">
+            <summary>
+            The length of the stream, or <c>null</c> if the stream doesn't support the feature.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.BencodeReader.EndOfStream">
+            <summary>
+            Returns true if the end of the stream has been reached.
+            This is true if either <see cref="P:BencodeNET.IO.BencodeReader.Position"/> is greater than <see cref="P:BencodeNET.IO.BencodeReader.Length"/> or if next char is <c>default(char)</c>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.#ctor(System.IO.Stream)">
+            <summary>
+            Creates a new <see cref="T:BencodeNET.IO.BencodeReader"/> for the specified <see cref="T:System.IO.Stream"/>.
+            </summary>
+            <param name="stream">The stream to read from.</param>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.#ctor(System.IO.Stream,System.Boolean)">
+            <summary>
+            Creates a new <see cref="T:BencodeNET.IO.BencodeReader"/> for the specified <see cref="T:System.IO.Stream"/>
+            using the default buffer size of 40,960 bytes and the option of leaving the stream open after disposing of this instance.
+            </summary>
+            <param name="stream">The stream to read from.</param>
+            <param name="leaveOpen">Indicates if the stream should be left open when this <see cref="T:BencodeNET.IO.BencodeReader"/> is disposed.</param>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.PeekChar">
+            <summary>
+            Peeks at the next character in the stream, or <c>default(char)</c> if the end of the stream has been reached.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.ReadChar">
+            <summary>
+            Reads the next character from the stream.
+            Returns <c>default(char)</c> if the end of the stream has been reached.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.Read(System.Byte[])">
+            <summary>
+            Reads into the <paramref name="buffer"/> by reading from the stream.
+            Returns the number of bytes actually read from the stream.
+            </summary>
+            <param name="buffer">The buffer to read into.</param>
+            <returns>The number of bytes actually read from the stream and filled into the buffer.</returns>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.IO.BencodeReader.Dispose(System.Boolean)">
+            <inheritdoc cref="M:BencodeNET.IO.BencodeReader.Dispose"/>
+        </member>
+        <member name="T:BencodeNET.IO.PipeBencodeReader">
+            <summary>
+            Reads chars and bytes from a <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.PipeBencodeReader.Reader">
+            <summary>
+            The <see cref="T:System.IO.Pipelines.PipeReader"/> to read from.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.PipeBencodeReader.ReaderCompleted">
+            <summary>
+            Indicates if the <see cref="T:System.IO.Pipelines.PipeReader"/> has been completed (i.e. "end of stream").
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.PipeBencodeReader.Position">
+            <summary>
+            The position in the pipe (number of read bytes/characters) (does not included peeked char).
+            </summary>
+        </member>
+        <member name="P:BencodeNET.IO.PipeBencodeReader.PreviousChar">
+            <summary>
+            The previously read/consumed char (does not include peeked char).
+            </summary>
+        </member>
+        <member name="M:BencodeNET.IO.PipeBencodeReader.#ctor(System.IO.Pipelines.PipeReader)">
+            <summary>
+            Creates a <see cref="T:BencodeNET.IO.PipeBencodeReader"/> that reads from the specified <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:BencodeNET.IO.PipeBencodeReader.PeekCharAsync(System.Threading.CancellationToken)">
+            <summary>
+            Peek at the next char in the pipe, without advancing the reader.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.IO.PipeBencodeReader.ReadCharAsync(System.Threading.CancellationToken)">
+            <summary>
+            Read the next char in the pipe and advance the reader.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.IO.PipeBencodeReader.ReadCharConsume(System.Buffers.ReadOnlySequence{System.Byte}@,System.Boolean)">
+            <summary>
+            Reads the next char in the pipe and consumes it (advances the reader),
+            unless <paramref name="peek"/> is <c>true</c>.
+            </summary>
+            <param name="buffer">The buffer to read from</param>
+            <param name="peek">If true the char will not be consumed, i.e. the reader should not be advanced.</param>
+        </member>
+        <member name="M:BencodeNET.IO.PipeBencodeReader.ReadAsync(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Read bytes from the pipe.
+            Returns the number of bytes actually read.
+            </summary>
+            <param name="bytes">The amount of bytes to read.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:BencodeNET.IO.PipeBencodeReader.TryReadConsume(System.IO.Pipelines.ReadResult,System.Span{System.Byte}@,System.Int64@)">
+            <summary>
+            Attempts to read the specified bytes from the reader and advances the reader if successful.
+            If the end of the pipe is reached then the available bytes is read and returned, if any.
+            <para>
+            Returns <c>true</c> if any bytes was read or the reader was completed.
+            </para>
+            </summary>
+            <param name="result">The read result from the pipe read operation.</param>
+            <param name="bytes">The bytes to read.</param>
+            <param name="bytesRead">The number of bytes read.</param>
+            <returns></returns>
+        </member>
+        <member name="T:BencodeNET.Objects.BDictionary">
+            <summary>
+            Represents a bencoded dictionary of <see cref="T:BencodeNET.Objects.BString"/> keys and <see cref="T:BencodeNET.Objects.IBObject"/> values.
+            </summary>
+            <remarks>
+            The underlying value is a <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Objects.BDictionary.Value">
+            <summary>
+            The underlying dictionary.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.#ctor">
+            <summary>
+            Creates an empty dictionary.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{BencodeNET.Objects.BString,BencodeNET.Objects.IBObject}})">
+            <summary>
+            Creates a dictionary from key-value pairs.
+            </summary>
+            <param name="keyValuePairs"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.#ctor(System.Collections.Generic.IDictionary{BencodeNET.Objects.BString,BencodeNET.Objects.IBObject})">
+            <summary>
+            Creates a dictionary with an initial value of the supplied dictionary.
+            </summary>
+            <param name="dictionary"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.Add(System.String,System.String)">
+            <summary>
+            Adds the specified key and value to the dictionary as <see cref="T:BencodeNET.Objects.BString"/>.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.Add(System.String,System.Int64)">
+            <summary>
+            Adds the specified key and value to the dictionary as <see cref="T:BencodeNET.Objects.BNumber"/>.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.Get``1(BencodeNET.Objects.BString)">
+            <summary>
+            Gets the value associated with the specified key and casts it as <typeparamref name="T"/>.
+            If the key does not exist or the value is not of the specified type null is returned.
+            </summary>
+            <typeparam name="T">The type to cast the value to.</typeparam>
+            <param name="key">The key to get the associated value of.</param>
+            <returns>The associated value of the specified key or null if the key does not exist.
+            If the value is not of the specified type null is returned as well.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.MergeWith(BencodeNET.Objects.BDictionary,BencodeNET.Objects.ExistingKeyAction)">
+            <summary>
+            Merges this instance with another <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+            <remarks>
+            By default existing keys are either overwritten (<see cref="T:BencodeNET.Objects.BString"/> and <see cref="T:BencodeNET.Objects.BNumber"/>) or merged if possible (<see cref="T:BencodeNET.Objects.BList"/> and <see cref="T:BencodeNET.Objects.BDictionary"/>).
+            This behavior can be changed with the <paramref name="existingKeyAction"/> parameter.
+            </remarks>
+            <param name="dictionary">The dictionary to merge into this instance.</param>
+            <param name="existingKeyAction">Decides how to handle the values of existing keys.</param>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.GetSizeInBytes">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.EncodeObject(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.EncodeObject(System.IO.Pipelines.PipeWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BDictionary.EncodeObjectAsync(System.IO.Pipelines.PipeWriter,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="P:BencodeNET.Objects.BDictionary.Item(BencodeNET.Objects.BString)">
+            <summary>
+            Returns the value associated with the key or null if the key doesn't exist.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Objects.ExistingKeyAction">
+            <summary>
+            Specifies the action to take when encountering an already existing key when merging two <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Objects.ExistingKeyAction.Merge">
+            <summary>
+            Merges the values of existing keys for <see cref="T:BencodeNET.Objects.BList"/> and <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            Overwrites existing keys for <see cref="T:BencodeNET.Objects.BString"/> and <see cref="T:BencodeNET.Objects.BNumber"/>.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Objects.ExistingKeyAction.Replace">
+            <summary>
+            Replaces the values of all existing keys.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Objects.ExistingKeyAction.Skip">
+            <summary>
+            Leaves all existing keys as they were.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Objects.BList">
+            <summary>
+            Represents a bencoded list of <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <remarks>
+            The underlying value is a <see cref="T:System.Collections.Generic.IList`1"/>.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Objects.BList.Value">
+            <summary>
+            The underlying list.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.#ctor">
+            <summary>
+            Creates an empty list.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a list from strings using <see cref="P:System.Text.Encoding.UTF8"/>.
+            </summary>
+            <param name="strings"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.#ctor(System.Collections.Generic.IEnumerable{System.String},System.Text.Encoding)">
+            <summary>
+            Creates a list from strings using the specified encoding.
+            </summary>
+            <param name="strings"></param>
+            <param name="encoding"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.#ctor(System.Collections.Generic.IEnumerable{BencodeNET.Objects.IBObject})">
+            <summary>
+            Creates a list from en <see cref="T:System.Collections.Generic.IEnumerable`1"/> of <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="objects"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.Add(System.String)">
+            <summary>
+            Adds a string to the list using <see cref="P:System.Text.Encoding.UTF8"/>.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.Add(System.String,System.Text.Encoding)">
+            <summary>
+            Adds a string to the list using the specified encoding.
+            </summary>
+            <param name="value"></param>
+            <param name="encoding"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.Add(System.Int32)">
+            <summary>
+            Adds an integer to the list.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.Add(System.Int64)">
+            <summary>
+            Adds a long to the list.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.AddRange(BencodeNET.Objects.BList)">
+            <summary>
+            Appends a list to the end of this instance.
+            </summary>
+            <param name="list"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.Get``1(System.Int32)">
+            <summary>
+            Gets the object at the specified index as <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type to cast the object to.</typeparam>
+            <param name="index">The index in the list to get the object from.</param>
+            <returns>The object at the specified index as the specified type or null if the object is not of that type.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.AsStrings">
+            <summary>
+            Assumes all elements are <see cref="T:BencodeNET.Objects.BString"/>
+            and returns an enumerable of their string representation.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.AsStrings(System.Text.Encoding)">
+            <summary>
+            Assumes all elements are <see cref="T:BencodeNET.Objects.BString"/> and returns
+            an enumerable of their string representation using the specified encoding.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.AsNumbers">
+            <summary>
+            Assumes all elements are <see cref="T:BencodeNET.Objects.BNumber"/>
+            and returns an enumerable of their <c>long</c> value.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.AsType``1">
+            <summary>
+            Attempts to cast all elements to the specified type.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+            <exception cref="T:System.InvalidCastException">
+            An element is not of type <typeparamref name="T"/>.
+            </exception>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.GetSizeInBytes">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.EncodeObject(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.EncodeObject(System.IO.Pipelines.PipeWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BList.EncodeObjectAsync(System.IO.Pipelines.PipeWriter,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:BencodeNET.Objects.BList`1">
+            <summary>
+            Represents a bencoded list of type <typeparamref name="T"/> which implements <see cref="T:BencodeNET.Objects.IBObject"/> .
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BList`1.Value">
+            <summary>
+            The underlying list.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList`1.#ctor">
+            <summary>
+            Creates an empty list.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BList`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Creates a list from the specified objects.
+            </summary>
+            <param name="objects"></param>
+        </member>
+        <member name="T:BencodeNET.Objects.BNumber">
+            <summary>
+            Represents a bencoded number (integer).
+            </summary>
+            <remarks>
+            The underlying value is a <see cref="T:System.Int64"/>.
+            </remarks>
+        </member>
+        <member name="F:BencodeNET.Objects.BNumber.MaxDigits">
+            <summary>
+            The string-length of long.MaxValue. Longer strings cannot be parsed.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BNumber.Value">
+            <summary>
+            The underlying value.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BNumber.#ctor(System.Int64)">
+            <summary>
+            Create a <see cref="T:BencodeNET.Objects.BNumber"/> from a <see cref="T:System.Int64"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BNumber.#ctor(System.Nullable{System.DateTime})">
+            <summary>
+            Create a <see cref="T:BencodeNET.Objects.BNumber"/> from a <see cref="T:System.DateTime"/>.
+            </summary>
+            <remarks>
+            Bencode dates are stored in unix format (seconds since epoch).
+            </remarks>
+        </member>
+        <member name="M:BencodeNET.Objects.BNumber.GetSizeInBytes">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BNumber.EncodeObject(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BNumber.EncodeObject(System.IO.Pipelines.PipeWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BNumber.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Objects.BObject">
+            <summary>
+            Abstract base class with default implementation of most methods of <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.GetSizeInBytes">
+            <summary>
+            Calculates the (encoded) size of the object in bytes.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeTo``1(``0)">
+            <summary>
+            Writes the object as bencode to the specified stream.
+            </summary>
+            <typeparam name="TStream">The type of stream.</typeparam>
+            <param name="stream">The stream to write to.</param>
+            <returns>The used stream.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeTo(System.IO.Pipelines.PipeWriter)">
+            <summary>
+            Writes the object as bencode to the specified <see cref="T:System.IO.Pipelines.PipeWriter"/> without flushing the writer,
+            you should do that manually.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeToAsync(System.IO.Pipelines.PipeWriter,System.Threading.CancellationToken)">
+            <summary>
+            Writes the object as bencode to the specified <see cref="T:System.IO.Pipelines.PipeWriter"/> and flushes the writer afterwards.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeToAsync(System.IO.Stream,System.IO.Pipelines.StreamPipeWriterOptions,System.Threading.CancellationToken)">
+            <summary>
+            Writes the object asynchronously as bencode to the specified <see cref="T:System.IO.Stream"/> using a <see cref="T:System.IO.Pipelines.PipeWriter"/>.
+            </summary>
+            <param name="stream">The stream to write to.</param>
+            <param name="writerOptions">The options for the <see cref="T:System.IO.Pipelines.PipeWriter"/>.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeObject(System.IO.Stream)">
+            <summary>
+            Implementations of this method should encode their
+            underlying value to bencode and write it to the stream.
+            </summary>
+            <param name="stream">The stream to encode to.</param>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeObject(System.IO.Pipelines.PipeWriter)">
+            <summary>
+            Implementations of this method should encode their underlying value to bencode and write it to the <see cref="T:System.IO.Pipelines.PipeWriter"/>.
+            </summary>
+            <param name="writer">The writer to encode to.</param>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject.EncodeObjectAsync(System.IO.Pipelines.PipeWriter,System.Threading.CancellationToken)">
+            <summary>
+            Encodes and writes the underlying value to the <see cref="T:System.IO.Pipelines.PipeWriter"/> and flushes the writer afterwards.
+            </summary>
+            <param name="writer">The writer to encode to.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:BencodeNET.Objects.BObject`1">
+            <summary>
+            Base class of bencode objects with a specific underlying value type.
+            </summary>
+            <typeparam name="T">Type of the underlying value.</typeparam>
+        </member>
+        <member name="P:BencodeNET.Objects.BObject`1.Value">
+            <summary>
+            The underlying value of the <see cref="T:BencodeNET.Objects.BObject`1"/>.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Objects.BObjectExtensions">
+            <summary>
+            Extensions to simplify encoding directly as a string or byte array.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BObjectExtensions.EncodeAsString(BencodeNET.Objects.IBObject)">
+            <summary>
+            Encodes the object and returns the result as a string using <see cref="P:System.Text.Encoding.UTF8"/>.
+            </summary>
+            <returns>The object bencoded and converted to a string using <see cref="P:System.Text.Encoding.UTF8"/>.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObjectExtensions.EncodeAsString(BencodeNET.Objects.BString)">
+            <summary>
+            Encodes the byte-string as bencode and returns the encoded string.
+            Uses the current value of the <see cref="T:System.Text.Encoding"/> property.
+            </summary>
+            <returns>The byte-string as a bencoded string.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObjectExtensions.EncodeAsString(BencodeNET.Objects.IBObject,System.Text.Encoding)">
+            <summary>
+            Encodes the object and returns the result as a string using the specified encoding.
+            </summary>
+            <param name="bobject"></param>
+            <param name="encoding">The encoding used to convert the encoded bytes to a string.</param>
+            <returns>The object bencoded and converted to a string using the specified encoding.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObjectExtensions.EncodeAsBytes(BencodeNET.Objects.IBObject)">
+            <summary>
+            Encodes the object and returns the raw bytes.
+            </summary>
+            <returns>The raw bytes of the bencoded object.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObjectExtensions.EncodeTo(BencodeNET.Objects.IBObject,System.String)">
+            <summary>
+            Writes the object as bencode to the specified file path.
+            </summary>
+            <param name="bobject"></param>
+            <param name="filePath">The file path to write the encoded object to.</param>
+        </member>
+        <member name="T:BencodeNET.Objects.BString">
+            <summary>
+            Represents a bencoded string, i.e. a byte-string.
+            It isn't necessarily human-readable.
+            </summary>
+            <remarks>
+            The underlying value is a <see cref="T:System.Byte"/> array.
+            </remarks>
+        </member>
+        <member name="F:BencodeNET.Objects.BString.LengthMaxDigits">
+            <summary>
+            The maximum number of digits that can be handled as the length part of a bencoded string.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BString.Value">
+            <summary>
+            The underlying bytes of the string.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BString.Length">
+            <summary>
+            Gets the length of the string in bytes.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BString.Encoding">
+            <summary>
+            Gets or sets the encoding used as the default with <c>ToString()</c>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.#ctor">
+            <summary>
+            Creates an empty <see cref="T:BencodeNET.Objects.BString"/> ('0:').
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.#ctor(System.Byte[],System.Text.Encoding)">
+            <summary>
+            Creates a <see cref="T:BencodeNET.Objects.BString"/> from bytes with the specified encoding.
+            </summary>
+            <param name="bytes">The bytes representing the data.</param>
+            <param name="encoding">The encoding of the bytes. Defaults to <see cref="P:System.Text.Encoding.UTF8"/>.</param>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.#ctor(System.String,System.Text.Encoding)">
+            <summary>
+            Creates a <see cref="T:BencodeNET.Objects.BString"/> using the specified encoding to convert the string to bytes.
+            </summary>
+            <param name="str">The string.</param>
+            <param name="encoding">The encoding used to convert the string to bytes.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.GetSizeInBytes">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.EncodeObject(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.EncodeObject(System.IO.Pipelines.PipeWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.ToString">
+            <summary>
+            Converts the underlying bytes to a string representation using the current value of the <see cref="P:BencodeNET.Objects.BString.Encoding"/> property.
+            </summary>
+            <returns>
+            A <see cref="T:System.String" /> that represents this instance.
+            </returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.ToString(System.Text.Encoding)">
+            <summary>
+            Converts the underlying bytes to a string representation using the specified encoding.
+            </summary>
+            <param name="encoding">The encoding to use to convert the underlying byte array to a <see cref="T:System.String" />.</param>
+            <returns>
+            A <see cref="T:System.String" /> that represents this instance.
+            </returns>
+        </member>
+        <member name="T:BencodeNET.Objects.IBObject">
+            <summary>
+            Represent a bencode value that can be encoded to bencode.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.IBObject.GetSizeInBytes">
+            <summary>
+            Calculates the (encoded) size of the object in bytes.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.IBObject.EncodeTo``1(``0)">
+            <summary>
+            Writes the object as bencode to the specified stream.
+            </summary>
+            <typeparam name="TStream">The type of stream.</typeparam>
+            <param name="stream">The stream to write to.</param>
+            <returns>The used stream.</returns>
+        </member>
+        <member name="M:BencodeNET.Objects.IBObject.EncodeTo(System.IO.Pipelines.PipeWriter)">
+            <summary>
+            Writes the object as bencode to the specified <see cref="T:System.IO.Pipelines.PipeWriter"/> without flushing the writer,
+            you should do that manually.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+        </member>
+        <member name="M:BencodeNET.Objects.IBObject.EncodeToAsync(System.IO.Pipelines.PipeWriter,System.Threading.CancellationToken)">
+            <summary>
+            Writes the object as bencode to the specified <see cref="T:System.IO.Pipelines.PipeWriter"/> and flushes the writer afterwards.
+            </summary>
+            <param name="writer">The writer to write to.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:BencodeNET.Objects.IBObject.EncodeToAsync(System.IO.Stream,System.IO.Pipelines.StreamPipeWriterOptions,System.Threading.CancellationToken)">
+            <summary>
+            Writes the object asynchronously as bencode to the specified <see cref="T:System.IO.Stream"/> using a <see cref="T:System.IO.Pipelines.PipeWriter"/>.
+            </summary>
+            <param name="stream">The stream to write to.</param>
+            <param name="writerOptions">The options for the <see cref="T:System.IO.Pipelines.PipeWriter"/>.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:BencodeNET.Parsing.BDictionaryParser">
+            <summary>
+            A parser for bencoded dictionaries.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Parsing.BDictionaryParser.MinimumLength">
+            <summary>
+            The minimum stream length in bytes for a valid dictionary ('de').
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BDictionaryParser.#ctor(BencodeNET.Parsing.IBencodeParser)">
+            <summary>
+            Creates an instance using the specified <see cref="T:BencodeNET.Parsing.IBencodeParser"/> for parsing contained keys and values.
+            </summary>
+            <param name="bencodeParser">The parser used for contained keys and values.</param>
+        </member>
+        <member name="P:BencodeNET.Parsing.BDictionaryParser.BencodeParser">
+            <summary>
+            The parser used for parsing contained keys and values.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.BDictionaryParser.Encoding">
+            <summary>
+            The encoding used for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BDictionaryParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BDictionary"/> and its contained keys and values from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BDictionary"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+        </member>
+        <member name="M:BencodeNET.Parsing.BDictionaryParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BDictionary"/> and its contained keys and values from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BDictionary"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+        </member>
+        <member name="T:BencodeNET.Parsing.BencodeParser">
+            <summary>
+            Main class used for parsing bencode.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.BencodeParser.Parsers">
+            <summary>
+            List of parsers used by the <see cref="T:BencodeNET.Parsing.BencodeParser"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.BencodeParser.Encoding">
+            <summary>
+            The encoding use for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParser.#ctor(System.Text.Encoding)">
+            <summary>
+            Creates an instance using the specified encoding and the default parsers.
+            Encoding defaults to <see cref="P:System.Text.Encoding.UTF8"/> if not specified.
+            </summary>
+            <param name="encoding">The encoding to use when parsing.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+             Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from the reader.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParser.Parse``1(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parse an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from the reader.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parse an <see cref="T:BencodeNET.Objects.IBObject"/> from the <see cref="T:BencodeNET.IO.PipeBencodeReader"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParser.ParseAsync``1(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parse an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from the <see cref="T:BencodeNET.IO.PipeBencodeReader"/>.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Parsing.BencodeParserExtensions">
+            <summary>
+            Extensions to simplify parsing strings, byte arrays or files directly.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.ParseString(BencodeNET.Parsing.IBencodeParser,System.String)">
+            <summary>
+            Parses a bencoded string into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="bencodedString">The bencoded string to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.Parse(BencodeNET.Parsing.IBencodeParser,System.Byte[])">
+            <summary>
+            Parses a bencoded array of bytes into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="bytes">The bencoded bytes to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.Parse(BencodeNET.Parsing.IBencodeParser,System.String)">
+            <summary>
+            Parses a bencoded file into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="filePath">The path to the file to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.ParseString``1(BencodeNET.Parsing.IBencodeParser,System.String)">
+            <summary>
+            Parses a bencoded string into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+            <param name="parser"></param>
+            <param name="bencodedString">The bencoded string to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.Parse``1(BencodeNET.Parsing.IBencodeParser,System.Byte[])">
+            <summary>
+            Parses a bencoded array of bytes into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+            <param name="parser"></param>
+            <param name="bytes">The bencoded bytes to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.Parse``1(BencodeNET.Parsing.IBencodeParser,System.String)">
+            <summary>
+            Parses a bencoded file into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="filePath">The path to the file to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.Parse(BencodeNET.Parsing.IBencodeParser,System.IO.Stream)">
+            <summary>
+            Parses a stream into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="stream">The stream to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.Parse``1(BencodeNET.Parsing.IBencodeParser,System.IO.Stream)">
+            <summary>
+            Parses a stream into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+            <param name="parser"></param>
+            <param name="stream">The stream to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.ParseAsync(BencodeNET.Parsing.IBencodeParser,System.IO.Pipelines.PipeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from the <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.ParseAsync``1(BencodeNET.Parsing.IBencodeParser,System.IO.Pipelines.PipeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from the <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.ParseAsync(BencodeNET.Parsing.IBencodeParser,System.IO.Stream,System.IO.Pipelines.StreamPipeReaderOptions,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from the <see cref="T:System.IO.Stream"/> asynchronously using a <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BencodeParserExtensions.ParseAsync``1(BencodeNET.Parsing.IBencodeParser,System.IO.Stream,System.IO.Pipelines.StreamPipeReaderOptions,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/>  of type <typeparamref name="T"/> from the <see cref="T:System.IO.Stream"/> asynchronously using a <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+        </member>
+        <member name="T:BencodeNET.Parsing.BListParser">
+            <summary>
+            A parser for bencoded lists.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Parsing.BListParser.MinimumLength">
+            <summary>
+            The minimum stream length in bytes for a valid list ('le').
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BListParser.#ctor(BencodeNET.Parsing.IBencodeParser)">
+            <summary>
+            Creates an instance using the specified <see cref="T:BencodeNET.Parsing.IBencodeParser"/> for parsing contained objects.
+            </summary>
+            <param name="bencodeParser">The parser used for parsing contained objects.</param>
+        </member>
+        <member name="P:BencodeNET.Parsing.BListParser.BencodeParser">
+            <summary>
+            The parser used for parsing contained objects.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.BListParser.Encoding">
+            <summary>
+            The encoding used for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BListParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BList"/> from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BList"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+        </member>
+        <member name="M:BencodeNET.Parsing.BListParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BList"/> from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BList"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+        </member>
+        <member name="T:BencodeNET.Parsing.BNumberParser">
+            <summary>
+            A parser for bencoded numbers.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Parsing.BNumberParser.MinimumLength">
+            <summary>
+            The minimum stream length in bytes for a valid number ('i0e').
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.BNumberParser.Encoding">
+            <summary>
+            The encoding used for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BNumberParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BNumber"/> from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BNumber"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+            <exception cref="T:BencodeNET.Exceptions.UnsupportedBencodeException`1">The bencode is unsupported by this library.</exception>
+        </member>
+        <member name="M:BencodeNET.Parsing.BNumberParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BNumber"/> from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BNumber"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+            <exception cref="T:BencodeNET.Exceptions.UnsupportedBencodeException`1">The bencode is unsupported by this library.</exception>
+        </member>
+        <member name="T:BencodeNET.Parsing.BObjectParser`1">
+            <summary>
+            Abstract base parser for parsing bencode of specific types.
+            </summary>
+            <typeparam name="T">The type of bencode object the parser returns.</typeparam>
+        </member>
+        <member name="P:BencodeNET.Parsing.BObjectParser`1.Encoding">
+            <summary>
+            The encoding used for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParser`1.Parse(System.IO.Stream)">
+            <summary>
+            Parses a stream into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <param name="stream">The stream to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParser`1.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from a <see cref="T:BencodeNET.IO.BencodeReader"/>.
+            </summary>
+            <param name="reader">The reader to read from.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParser`1.ParseAsync(System.IO.Pipelines.PipeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from a <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+            <param name="pipeReader">The pipe reader to read from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParser`1.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from a <see cref="T:BencodeNET.IO.PipeBencodeReader"/>.
+            </summary>
+            <param name="pipeReader">The pipe reader to read from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="T:BencodeNET.Parsing.BObjectParserExtensions">
+            <summary>
+            Extensions to simplify parsing strings and byte arrays.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserExtensions.ParseString(BencodeNET.Parsing.IBObjectParser,System.String)">
+            <summary>
+            Parses a bencoded string into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="bencodedString">The bencoded string to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserExtensions.Parse(BencodeNET.Parsing.IBObjectParser,System.Byte[])">
+            <summary>
+            Parses a byte array into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="bytes">The bytes to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserExtensions.ParseString``1(BencodeNET.Parsing.IBObjectParser{``0},System.String)">
+            <summary>
+            Parses a bencoded string into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="bencodedString">The bencoded string to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserExtensions.Parse``1(BencodeNET.Parsing.IBObjectParser{``0},System.Byte[])">
+            <summary>
+            Parses a byte array into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <param name="parser"></param>
+            <param name="bytes">The bytes to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="T:BencodeNET.Parsing.BObjectParserList">
+            <summary>
+            A special collection for <see cref="T:BencodeNET.Parsing.IBObjectParser"/> that has some extra methods
+            for efficiently adding and accessing parsers by the type they can parse.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Add(System.Type,BencodeNET.Parsing.IBObjectParser)">
+            <summary>
+            Adds a parser for the specified type.
+            Existing parsers for this type will be replaced.
+            </summary>
+            <param name="type">The type this parser can parse.</param>
+            <param name="parser">The parser to add.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Add(System.Collections.Generic.IEnumerable{System.Type},BencodeNET.Parsing.IBObjectParser)">
+            <summary>
+            Adds a parser for the specified type.
+            Existing parsers for this type will be replaced.
+            </summary>
+            <param name="types">The types this parser can parse.</param>
+            <param name="parser">The parser to add.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Add``1(BencodeNET.Parsing.IBObjectParser{``0})">
+            <summary>
+            Adds a specific parser.
+            Existing parsers for the type will be replaced.
+            </summary>
+            <typeparam name="T">The type this parser can parse.</typeparam>
+            <param name="parser">The parser to add.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.AddOrReplace(System.Type,BencodeNET.Parsing.IBObjectParser)">
+            <summary>
+            Adds a parser for the specified type.
+            Existing parsers for this type will be replaced.
+            </summary>
+            <param name="type">The type this parser can parse.</param>
+            <param name="parser">The parser to add.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.AddOrReplace(System.Collections.Generic.IEnumerable{System.Type},BencodeNET.Parsing.IBObjectParser)">
+            <summary>
+            Adds a parser for the specified type.
+            Existing parsers for this type will be replaced.
+            </summary>
+            <param name="types">The types this parser can parse.</param>
+            <param name="parser">The parser to add.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.AddOrReplace``1(BencodeNET.Parsing.IBObjectParser{``0})">
+            <summary>
+            Adds a specific parser.
+            Existing parsers for the type will be replaced.
+            </summary>
+            <typeparam name="T">The type this parser can parse.</typeparam>
+            <param name="parser">The parser to add.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Get(System.Type)">
+            <summary>
+            Gets the parser, if any, for the specified type.
+            </summary>
+            <param name="type">The type to get a parser for.</param>
+            <returns>The parser for the specified type or null if there isn't one.</returns>
+        </member>
+        <member name="P:BencodeNET.Parsing.BObjectParserList.Item(System.Type)">
+            <summary>
+            Gets the parser, if any, for the specified type.
+            </summary>
+            <param name="type">The type to get a parser for.</param>
+            <returns>The parser for the specified type or null if there isn't one.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Get``1">
+            <summary>
+            Gets the parser, if any, for the specified type.
+            </summary>
+            <typeparam name="T">The type to get a parser for.</typeparam>
+            <returns>The parser for the specified type or null if there isn't one.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.GetSpecific``1">
+            <summary>
+            Gets the specific parser of the type specified or null if not found.
+            </summary>
+            <typeparam name="T">The parser type to get.</typeparam>
+            <returns>The parser of the specified type or null if there isn't one.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Remove(System.Type)">
+            <summary>
+            Removes the parser for the specified type.
+            </summary>
+            <param name="type">The type to remove the parser for.</param>
+            <returns>True if successful, false otherwise.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Remove``1">
+            <summary>
+            Removes the parser for the specified type.
+            </summary>
+            <typeparam name="T">The type to remove the parser for.</typeparam>
+            <returns>True if successful, false otherwise.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.Clear">
+            <summary>
+            Empties the collection.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BObjectParserList.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the collection.
+            </summary>
+            <returns>An enumerator that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="T:BencodeNET.Parsing.BStringParser">
+            <summary>
+            A parser for bencoded byte strings.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Parsing.BStringParser.MinimumLength">
+            <summary>
+            The minimum stream length in bytes for a valid string ('0:').
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.#ctor">
+            <summary>
+            Creates an instance using <see cref="P:System.Text.Encoding.UTF8"/> for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.#ctor(System.Text.Encoding)">
+            <summary>
+            Creates an instance using the specified encoding for parsing.
+            </summary>
+            <param name="encoding"></param>
+        </member>
+        <member name="P:BencodeNET.Parsing.BStringParser.Encoding">
+            <summary>
+            The encoding used when creating the <see cref="T:BencodeNET.Objects.BString"/> when parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.ChangeEncoding(System.Text.Encoding)">
+            <summary>
+            Changes the encoding used for parsing.
+            </summary>
+            <param name="encoding">The new encoding to use.</param>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BString"/> from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BString"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+            <exception cref="T:BencodeNET.Exceptions.UnsupportedBencodeException`1">The bencode is unsupported by this library.</exception>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BString"/> from the reader.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed <see cref="T:BencodeNET.Objects.BString"/>.</returns>
+            <exception cref="T:BencodeNET.Exceptions.InvalidBencodeException`1">Invalid bencode.</exception>
+            <exception cref="T:BencodeNET.Exceptions.UnsupportedBencodeException`1">The bencode is unsupported by this library.</exception>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.EnsureLengthStringBelowMaxLength(System.Int32,System.Int64)">
+            <summary>
+            Ensures that the length (number of digits) of the string-length part is not above <see cref="F:BencodeNET.Objects.BString.LengthMaxDigits"/>
+            as that would equal 10 GB of data, which we cannot handle.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.EnsurePreviousCharIsColon(System.Char,System.Int64)">
+            <summary>
+            Ensure that the previously read char is a colon (:),
+            separating the string-length part and the actual string value.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.ParseStringLength(System.Span{System.Char},System.Int32,System.Int64)">
+            <summary>
+            Parses the string-length <see cref="T:System.String"/> into a <see cref="T:System.Int64"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.BStringParser.EnsureExpectedBytesRead(System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Ensures that number of bytes read matches the expected number parsed from the string-length part.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Parsing.IBencodeParser">
+            <summary>
+            Represents a parser capable of parsing bencode.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.IBencodeParser.Parsers">
+            <summary>
+            List of parsers used by the <see cref="T:BencodeNET.Parsing.IBencodeParser"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.IBencodeParser.Encoding">
+            <summary>
+            The encoding use for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBencodeParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+             Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from the reader.
+            </summary>
+            <param name="reader"></param>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBencodeParser.Parse``1(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parse an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from the reader.
+            </summary>
+            <typeparam name="T">The type of <see cref="T:BencodeNET.Objects.IBObject"/> to parse as.</typeparam>
+            <param name="reader"></param>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBencodeParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parse an <see cref="T:BencodeNET.Objects.IBObject"/> from the <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBencodeParser.ParseAsync``1(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parse an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from the <see cref="T:BencodeNET.IO.PipeBencodeReader"/>.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Parsing.IBObjectParser">
+            <summary>
+            A contract for parsing bencode from different sources as an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Parsing.IBObjectParser.Encoding">
+            <summary>
+            The encoding used for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser.Parse(System.IO.Stream)">
+            <summary>
+            Parses a stream into an <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+            <param name="stream">The stream to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from a <see cref="T:BencodeNET.IO.BencodeReader"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser.ParseAsync(System.IO.Pipelines.PipeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from a <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+            <param name="pipeReader">The pipe reader to read from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> from a <see cref="T:BencodeNET.IO.PipeBencodeReader"/>.
+            </summary>
+            <param name="pipeReader">The pipe reader to read from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="T:BencodeNET.Parsing.IBObjectParser`1">
+            <summary>
+            A contract for parsing bencode from different sources as type <typeparamref name="T"/> inheriting <see cref="T:BencodeNET.Objects.IBObject"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser`1.Parse(System.IO.Stream)">
+            <summary>
+            Parses a stream into an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/>.
+            </summary>
+            <param name="stream">The stream to parse.</param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser`1.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from a <see cref="T:BencodeNET.IO.BencodeReader"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser`1.ParseAsync(System.IO.Pipelines.PipeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from a <see cref="T:System.IO.Pipelines.PipeReader"/>.
+            </summary>
+            <param name="pipeReader">The pipe reader to read from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="M:BencodeNET.Parsing.IBObjectParser`1.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses an <see cref="T:BencodeNET.Objects.IBObject"/> of type <typeparamref name="T"/> from a <see cref="T:BencodeNET.IO.PipeBencodeReader"/>.
+            </summary>
+            <param name="pipeReader">The pipe reader to read from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed object.</returns>
+        </member>
+        <member name="T:BencodeNET.Parsing.ParseUtil">
+            <summary>
+            A collection of helper methods for parsing bencode.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.ParseUtil.TryParseLongFast(System.String,System.Int64@)">
+            <summary>
+            A faster implementation than <see cref="M:System.Int64.TryParse(System.String,System.Int64@)"/>
+            because we skip some checks that are not needed.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Parsing.ParseUtil.TryParseLongFast(System.ReadOnlySpan{System.Char},System.Int64@)">
+            <summary>
+            A faster implementation than <see cref="M:System.Int64.TryParse(System.String,System.Int64@)"/>
+            because we skip some checks that are not needed.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.InvalidTorrentException">
+            <summary>
+            Represents parse errors when parsing torrents.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.MagnetLinkOptions">
+            <summary>
+            Possible options for controlling magnet link generation.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.MagnetLinkOptions.None">
+            <summary>
+            Results in the bare minimum magnet link containing only info hash and display name.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.MagnetLinkOptions.IncludeTrackers">
+            <summary>
+            Includes trackers in the magnet link.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.MultiFileInfo">
+            <summary>
+            File info for files in a multi-file torrents.
+            This
+            </summary>
+            <remarks>
+            Corresponds to an entry in the 'info.files' list field in a torrent.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.FileName">
+            <summary>
+            The file name. It just returns the last part of <see cref="P:BencodeNET.Torrents.MultiFileInfo.Path"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.FileNameUtf8">
+            <summary>
+            The UTF-8 encoded file name. It just returns the last part of <see cref="P:BencodeNET.Torrents.MultiFileInfo.PathUtf8"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.FileSize">
+            <summary>
+            The file size in bytes.
+            </summary>
+            <remarks>
+            Corresponds to the 'length' field.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.Md5Sum">
+            <summary>
+            [optional] 32-character hexadecimal string corresponding to the MD5 sum of the file. Rarely used.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.Path">
+            <summary>
+            A list of file path elements.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.PathUtf8">
+            <summary>
+            A list of UTF-8 encoded file path elements.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.FullPath">
+            <summary>
+            The full path of the file including file name.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfo.FullPathUtf8">
+            <summary>
+            The full UTF-8 encoded path of the file including file name.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.MultiFileInfoList">
+            <summary>
+            A list of file info for the files included in a multi-file torrent.
+            </summary>
+            <remarks>
+            Corresponds to the 'info' field in a multi-file torrent.
+            </remarks>
+        </member>
+        <member name="M:BencodeNET.Torrents.MultiFileInfoList.#ctor">
+            <summary> </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.MultiFileInfoList.#ctor(System.String)">
+            <summary></summary>
+            <param name="directoryName">Name of directory to store files in.</param>
+        </member>
+        <member name="M:BencodeNET.Torrents.MultiFileInfoList.#ctor(System.String,System.String)">
+            <summary></summary>
+            <param name="directoryName">Name of directory to store files in.</param>
+            <param name="directoryNameUtf8">Name of directory to store files in.</param>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfoList.DirectoryName">
+            <summary>
+            The name of the directory in which to store all the files. This is purely advisory.
+            </summary>
+            <remarks>
+            Corresponds to the 'name' field.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.MultiFileInfoList.DirectoryNameUtf8">
+            <summary>
+            The UTF-8 encoded name of the directory in which to store all the files. This is purely advisory.
+            </summary>
+            <remarks>
+            Corresponds to the 'name.utf-8' field.
+            </remarks>
+        </member>
+        <member name="T:BencodeNET.Torrents.SingleFileInfo">
+            <summary>
+            File info for a file in a single-file torrent.
+            </summary>
+            <remarks>
+            Corresponds to the 'info' field in a single-file torrent.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.SingleFileInfo.FileName">
+            <summary>
+            The file name. This is purely advisory.
+            </summary>
+            <remarks>
+            Corresponds to the 'name' field.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.SingleFileInfo.FileNameUtf8">
+            <summary>
+            The UTF-8 encoded file name. This is purely advisory.
+            </summary>
+            <remarks>
+            Corresponds to the 'name.utf-8' field.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.SingleFileInfo.FileSize">
+            <summary>
+            The file size in bytes.
+            </summary>
+            <remarks>
+            Corresponds to the 'length' field.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.SingleFileInfo.Md5Sum">
+            <summary>
+            [optional] 32-character hexadecimal string corresponding to the MD5 sum of the file. Rarely used.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.Torrent">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.#ctor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.#ctor(BencodeNET.Objects.BDictionary)">
+            <summary>
+            Creates a torrent and populates the <see cref="P:BencodeNET.Torrents.Torrent.OriginalInfoHash"/> and <see cref="P:BencodeNET.Torrents.Torrent.OriginalInfoHashBytes"/>
+            properties from the provided <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+            <param name="originalInfoDictionary"></param>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.OriginalInfoHash">
+            <summary>
+            The original info hash value from when the torrent was parsed.
+            This will be null if the instance was created manually and not by the parser.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.OriginalInfoHashBytes">
+            <summary>
+            The original info hash bytes from when the torrent was parsed.
+            This will be null if the instance was created manually and not by the parser.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.ExtraFields">
+            <summary>
+            Add any custom fields to this <see cref="T:BencodeNET.Objects.BDictionary"/> and they will
+            be merged with the torrent data when encoded.
+            </summary>
+            <remarks>
+            Existing keys will be overwritten with the values from this property.
+            In the case the existing and new value are both <see cref="T:BencodeNET.Objects.BList"/> the new list will be appended to the existing list.
+            In the case the existing and new value are both <see cref="T:BencodeNET.Objects.BDictionary"/> they will be merged recursively.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.Trackers">
+             <summary>
+             A list of list of trackers (announce URLs).
+             Lists are processed in order of first to last. Trackers in a list are processed randomly.
+             </summary>
+            
+             <remarks>
+             <para>
+             The lists will be processed by clients in order of first to last.
+             For each list the trackers will be processed in random order until one is successful.
+             If no trackers in the first list responds, the next list is attempted etc.
+             </para>
+            
+             <para>
+             See more here: http://bittorrent.org/beps/bep_0012.html
+             </para>
+             </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.File">
+            <summary>
+            File info  for the file in the torrent. Will be <c>null</c> for multi-file torrents.
+            </summary>
+            <remarks>
+            Corresponds to the 'info' field in a single-file torrent.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.Files">
+            <summary>
+            A list of file info for the files in the torrent. Will be <c>null</c> for single-file torrents.
+            </summary>
+            <remarks>
+            Corresponds to the 'info' field in a multi-file torrent.
+            </remarks>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.FileMode">
+            <summary>
+            The file mode of the torrent.
+            Torrents can be either single-file or multi-file and the content of the 'info' differs depending on this.
+            <para>
+            If <c>Single</c> then the <see cref="P:BencodeNET.Torrents.Torrent.File"/> property is populated.
+            if <c>Multi</c> then the <see cref="P:BencodeNET.Torrents.Torrent.Files"/> property is populated.
+            </para>
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.DisplayName">
+            <summary>
+            Returns the "display name" of the torrent.
+            For single-file torrents this is the file name of that file.
+            For multi-file torrents this is the directory name.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.DisplayNameUtf8">
+            <summary>
+            Returns the UTF-8 "display name" of the torrent.
+            For single-file torrents this is the file name of that file.
+            For multi-file torrents this is the directory name.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.CreationDate">
+            <summary>
+            [optional] The creation date of the torrent.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.Comment">
+            <summary>
+            [optional] Torrent comment.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.CreatedBy">
+            <summary>
+            [optional] The name and version of the program used to create this torrent.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.Encoding">
+            <summary>
+            [optional] Indicates the encoding used to store the strings in this torrents.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.PieceSize">
+            <summary>
+            The size in bytes of each file piece (piece length).
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.Pieces">
+            <summary>
+            A concatenation of all 20-byte SHA1 hash values (one for each piece).
+            Use <see cref="P:BencodeNET.Torrents.Torrent.PiecesAsHexString"/> to get/set this value as a hex string instead.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.PiecesAsHexString">
+            <summary>
+            Gets or sets <see cref="P:BencodeNET.Torrents.Torrent.Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
+            The length of the string must be a multiple of 40.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.IsPrivate">
+            <summary>
+            [optional] If set to true clients must only publish it's presence to the defined trackers.
+            Mainly used for private trackers which don't allow PEX, DHT etc.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.TotalSize">
+            <summary>
+            The total size in bytes of the included files.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.Torrent.NumberOfPieces">
+            <summary>
+            The total number of file pieces.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.ToBDictionary">
+            <summary>
+            Converts the torrent to a <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.CreateInfoDictionary(System.Text.Encoding)">
+            <summary>
+            Creates the 'info' part of the torrent.
+            </summary>
+            <param name="encoding">The encoding used for writing strings</param>
+            <returns>A <see cref="T:BencodeNET.Objects.BDictionary"/> of the 'info' part of the torrent</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.GetInfoHash">
+            <summary>
+            Calculates the info hash of the torrent. This is used when communicating with trackers.
+            The info hash is a 20-byte SHA1 hash of the value of the 'info' <see cref="T:BencodeNET.Objects.BDictionary"/> of the torrent.
+            </summary>
+            <returns>A string representation of a 20-byte SHA1 hash of the value of the 'info' part</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.GetInfoHashBytes">
+            <summary>
+            Calculates the info hash of the torrent. This is used when communicating with trackers.
+            The info hash is a 20-byte SHA1 hash of the value of the 'info' <see cref="T:BencodeNET.Objects.BDictionary"/> of the torrent.
+            </summary>
+            <returns>A 20-byte SHA1 hash of the value of the 'info' part</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.GetMagnetLink(BencodeNET.Torrents.MagnetLinkOptions)">
+            <summary>
+            Creates a Magnet link in the BTIH (BitTorrent Info Hash) format: xt=urn:btih:{info hash}
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.GetSizeInBytes">
+            <inheritdoc/>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.EncodeObject(System.IO.Stream)">
+            <summary>
+            Encodes the torrent and writes it to the stream.
+            </summary>
+            <param name="stream"></param>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.EncodeObject(System.IO.Pipelines.PipeWriter)">
+            <summary>
+            Encodes the torrent and writes it to the <see cref="T:System.IO.Pipelines.PipeWriter"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.Torrent.EncodeObjectAsync(System.IO.Pipelines.PipeWriter,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentFields">
+            <summary>
+            A reference of default torrent field names.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentInfoFields">
+            <summary>
+            A reference of default torrent fields names in the 'info'-dictionary.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentFilesFields">
+            <summary>
+            A reference of default torrent fields in the dictionaries in the 'files'-list in the 'info'-dictionary.s
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentFileMode">
+            <summary>
+            Indicates the torrent file mode.
+            Torrents are structured differently if it is either single-file or multi-file.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.TorrentFileMode.Unknown">
+            <summary>
+            Torrent file mode could not be determined and is most likely invalid.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.TorrentFileMode.Single">
+            <summary>
+            Single-file torrent. Contains only a single file.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.TorrentFileMode.Multi">
+            <summary>
+            Multi-file torrent. Can contain multiple files and a parent directory name for all included files.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentParser">
+            <summary>
+            A parser for torrent files.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.TorrentParser.ParseMode">
+            <summary>
+            The parsing mode used when parsing torrents.
+            You can use <see cref="F:BencodeNET.Torrents.TorrentParserMode.Tolerant"/> if your torrent files are not always following the torrent specification.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.#ctor">
+            <summary>
+            Creates an instance using a default <see cref="T:BencodeNET.Parsing.IBencodeParser"/>.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.#ctor(BencodeNET.Torrents.TorrentParserMode)">
+            <summary>
+            Creates an instance with the specified <see cref="T:BencodeNET.Torrents.TorrentParserMode"/> using a default <see cref="T:BencodeNET.Parsing.IBencodeParser"/>.
+            </summary>
+            <param name="torrentParserMode">The parser used for parsing the torrent <see cref="T:BencodeNET.Objects.BDictionary"/>.</param>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.#ctor(BencodeNET.Parsing.IBencodeParser)">
+            <summary>
+            Creates an instance using the specified <see cref="T:BencodeNET.Parsing.IBencodeParser"/> for parsing
+            the torrent <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+            <param name="bencodeParser">The parser used for parsing the torrent <see cref="T:BencodeNET.Objects.BDictionary"/>.</param>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.#ctor(BencodeNET.Parsing.IBencodeParser,BencodeNET.Torrents.TorrentParserMode)">
+            <summary>
+            Creates an instance using the specified <see cref="T:BencodeNET.Parsing.IBencodeParser"/> for parsing
+            the torrent <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+            <param name="bencodeParser">The parser used for parsing the torrent <see cref="T:BencodeNET.Objects.BDictionary"/>.</param>
+            <param name="torrentParserMode">The parsing mode to use.</param>
+        </member>
+        <member name="P:BencodeNET.Torrents.TorrentParser.BencodeParser">
+            <summary>
+            The parser ued for parsing the torrent <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Torrents.TorrentParser.Encoding">
+            <summary>
+            The encoding used for parsing.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.Parse(BencodeNET.IO.BencodeReader)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BDictionary"/> from the reader as a <see cref="T:BencodeNET.Torrents.Torrent"/>.
+            </summary>
+            <param name="reader">The reader to parse from.</param>
+            <returns>The parsed <see cref="T:BencodeNET.Torrents.Torrent"/>.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.ParseAsync(BencodeNET.IO.PipeBencodeReader,System.Threading.CancellationToken)">
+            <summary>
+            Parses the next <see cref="T:BencodeNET.Objects.BDictionary"/> from the reader as a <see cref="T:BencodeNET.Torrents.Torrent"/>.
+            </summary>
+            <param name="pipeReader">The reader to parse from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The parsed <see cref="T:BencodeNET.Torrents.Torrent"/>.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.CreateTorrent(BencodeNET.Objects.BDictionary)">
+            <summary>
+            Creates a torrent by reading the relevant data from the <see cref="T:BencodeNET.Objects.BDictionary"/>.
+            </summary>
+            <param name="data">The torrent bencode data.</param>
+            <returns>A <see cref="T:BencodeNET.Torrents.Torrent"/> matching the input.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.EnsureValidTorrentData(BencodeNET.Objects.BDictionary)">
+            <summary>
+            Checks the torrent data for required fields and throws an exception if any are missing or invalid.
+            </summary>
+            <param name="data">The torrent data.</param>
+            <exception cref="T:BencodeNET.Torrents.InvalidTorrentException">The torrent data is missing required fields or otherwise invalid.</exception>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.ParseSingleFileInfo(BencodeNET.Objects.BDictionary,System.Text.Encoding)">
+            <summary>
+            Parses file info for single-file torrents.
+            </summary>
+            <param name="info">The 'info'-dictionary of a torrent.</param>
+            <param name="encoding"></param>
+            <returns>The file info.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.ParseMultiFileInfo(BencodeNET.Objects.BDictionary,System.Text.Encoding)">
+            <summary>
+            Parses file info for multi-file torrents.
+            </summary>
+            <param name="info">The 'info'-dictionary of a torrent.</param>
+            <param name="encoding"></param>
+            <returns>The file info.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.ParseAnyExtraFields(BencodeNET.Objects.BDictionary,System.Text.Encoding)">
+            <summary>
+            Parses any extra fields from the root or the 'info'-dictionary
+            that are not otherwise represented in a <see cref="T:BencodeNET.Torrents.Torrent"/>.
+            </summary>
+            <param name="root"></param>
+            <param name="encoding"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.ParseTrackers(BencodeNET.Objects.BDictionary,System.Text.Encoding)">
+            <summary>
+            Parses trackers (announce URLs) from a torrent.
+            </summary>
+            <param name="data">The torrent data to parse trackers from.</param>
+            <param name="encoding"></param>
+            <returns>A list of list of trackers (announce URLs).</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentParser.ParseEncoding(BencodeNET.Objects.BString)">
+            <summary>
+            Parses the encoding string to an <see cref="P:BencodeNET.Torrents.TorrentParser.Encoding"/>.
+            Returns null if parsing fails.
+            </summary>
+            <param name="bstring">The <see cref="T:BencodeNET.Objects.BString"/> value to parse.</param>
+            <returns>The parsed encoding or null if parsing fails.</returns>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentParserMode">
+            <summary>
+            Determines how strict to be when parsing torrent files.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.TorrentParserMode.Strict">
+            <summary>
+            The parser will throw an exception if some parts of the torrent specification is not followed.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Torrents.TorrentParserMode.Tolerant">
+            <summary>
+             The parser will ignore stuff that doesn't follow the torrent specifications.
+            </summary>
+        </member>
+        <member name="T:BencodeNET.Torrents.TorrentUtil">
+            <summary>
+            Utility class for doing torrent-related work like calculating info hash and creating magnet links.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.CalculateInfoHash(BencodeNET.Torrents.Torrent)">
+             <summary>
+             Calculates the info hash of the torrent.
+             The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+             used to uniquely identify it and it's contents.
+            
+             <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+             </summary>
+             <param name="torrent">The torrent to calculate the info hash for.</param>
+             <returns>A string representation of the 20-byte SHA1 hash without dashes.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.CalculateInfoHashBytes(BencodeNET.Torrents.Torrent)">
+             <summary>
+             Calculates the info hash of the torrent.
+             The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+             used to uniquely identify it and it's contents.
+            
+             <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+             </summary>
+             <param name="torrent">The torrent to calculate the info hash for.</param>
+             <returns>A byte-array of the 20-byte SHA1 hash.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.CalculateInfoHash(BencodeNET.Objects.BDictionary)">
+             <summary>
+             Calculates the hash of the 'info'-dictionary.
+             The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+             used to uniquely identify it and it's contents.
+            
+             <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+             </summary>
+             <param name="info">The 'info'-dictionary of a torrent.</param>
+             <returns>A string representation of the 20-byte SHA1 hash without dashes.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.CalculateInfoHashBytes(BencodeNET.Objects.BDictionary)">
+             <summary>
+             Calculates the hash of the 'info'-dictionary.
+             The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+             used to uniquely identify it and it's contents.
+            
+             <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+             </summary>
+             <param name="info">The 'info'-dictionary of a torrent.</param>
+             <returns>A byte-array of the 20-byte SHA1 hash.</returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.BytesToHexString(System.Byte[])">
+            <summary>
+            Converts the byte array to a hexadecimal string representation without hyphens.
+            </summary>
+            <param name="bytes"></param>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.CreateMagnetLink(BencodeNET.Torrents.Torrent,BencodeNET.Torrents.MagnetLinkOptions)">
+            <summary>
+            Creates a Magnet link in the BTIH (BitTorrent Info Hash) format: xt=urn:btih:{info hash}
+            </summary>
+            <param name="torrent">Torrent to create Magnet link for.</param>
+            <param name="options">Controls how the Magnet link is constructed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:BencodeNET.Torrents.TorrentUtil.CreateMagnetLink(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},BencodeNET.Torrents.MagnetLinkOptions)">
+            <summary>
+            Creates a Magnet link in the BTIH (BitTorrent Info Hash) format: xt=urn:btih:{info hash}
+            </summary>
+            <param name="infoHash">The info has of the torrent.</param>
+            <param name="displayName">The display name of the torrent. Usually the file name or directory name for multi-file torrents</param>
+            <param name="trackers">A list of trackers if any.</param>
+            <param name="options">Controls how the Magnet link is constructed.</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
