@@ -119,6 +119,7 @@ Public Class Form1
                             Dim t() As Byte = My.Computer.FileSystem.ReadAllBytes(f.FullName)
 
                             If t.Length = 0 Then Throw New Exception("文件无效")
+
                             Dim RA() As Byte = System.Text.Encoding.UTF8.GetBytes(TextBox3.Text)
                             Dim RB() As Byte = System.Text.Encoding.UTF8.GetBytes(TextBox4.Text)
                             Dim ByteEqual As New Func(Of Byte(), Byte(), Integer, Boolean)(
@@ -129,8 +130,10 @@ Public Class Form1
                                     Next
                                     Return True
                                 End Function)
+
                             Dim tout As New IO.MemoryStream()
                             Dim tPtr As Integer = 0
+                            Dim Replaced As Integer = 0
                             While tPtr <= t.Length - 1
                                 If Not ByteEqual(t, RA, tPtr) Then
                                     tout.WriteByte(t(tPtr))
@@ -138,8 +141,11 @@ Public Class Form1
                                 Else
                                     tout.Write(RB, 0, RB.Length)
                                     tPtr += RA.Length
+                                    Replaced += 1
                                 End If
                             End While
+                            If Replaced = 0 Then Throw New Exception("未匹配到目标文本")
+                            If Replaced > 1 Then Info("警告：匹配次数" & Replaced)
                             t = tout.ToArray()
                             tout = New IO.MemoryStream()
                             tPtr = 0
@@ -151,7 +157,7 @@ Public Class Form1
                                             Dim slenb(tj - ti - 11) As Byte
                                             Array.Copy(t, ti + 10, slenb, 0, tj - ti - 10)
                                             Dim slen As String = System.Text.Encoding.UTF8.GetString(slenb)
-                                            Dim tlen() As Byte = System.Text.Encoding.UTF8.GetBytes((Integer.Parse(slen) - RA.Length + RB.Length).ToString)
+                                            Dim tlen() As Byte = System.Text.Encoding.UTF8.GetBytes((Integer.Parse(slen) + Replaced * (RB.Length - RA.Length)).ToString)
                                             tout.Write(tlen, 0, tlen.Length)
                                             tout.Write(t, tj, t.Length - tj)
                                             Exit For
