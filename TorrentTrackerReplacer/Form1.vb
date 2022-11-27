@@ -52,8 +52,10 @@ Public Class Form1
                                 Next
                             Next
                             If CheckBox1.Checked Then
-                                Info("保存备份文件：" & f.FullName & "." & tnow & ".bak")
-                                My.Computer.FileSystem.CopyFile(f.FullName, f.FullName & "." & tnow & ".bak")
+                                Dim bakpath As String = My.Computer.FileSystem.CombinePath(f.DirectoryName, "Backup_" & tnow)
+                                bakpath = My.Computer.FileSystem.CombinePath(bakpath, f.Name)
+                                Info("保存备份文件：" & bakpath)
+                                My.Computer.FileSystem.CopyFile(f.FullName, bakpath)
                             End If
                             Dim s As New IO.FileStream(f.FullName, IO.FileMode.Create)
                             t.EncodeTo(s)
@@ -169,8 +171,10 @@ Public Class Form1
 
                             t = tout.ToArray()
                             If CheckBox1.Checked Then
-                                Info("保存备份文件：" & f.FullName & "." & tnow & ".bak")
-                                My.Computer.FileSystem.CopyFile(f.FullName, f.FullName & "." & tnow & ".bak")
+                                Dim bakpath As String = My.Computer.FileSystem.CombinePath(f.DirectoryName, "Backup_" & tnow)
+                                bakpath = My.Computer.FileSystem.CombinePath(bakpath, f.Name)
+                                Info("保存备份文件：" & bakpath)
+                                My.Computer.FileSystem.CopyFile(f.FullName, bakpath)
                             End If
                             My.Computer.FileSystem.WriteAllBytes(f.FullName, t, False)
                             Info("OK")
