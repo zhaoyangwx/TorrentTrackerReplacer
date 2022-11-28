@@ -14,6 +14,7 @@ Public Class Form1
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Dim T1 As String = TextBox1.Text
         Dim T2 As String = TextBox2.Text
+        Dim SkipKW() As String = TextBox5.Text.Split({"|"}, StringSplitOptions.RemoveEmptyEntries)
         If Not T2.EndsWith(".torrent") Then
             If MessageBox.Show("文件后缀似乎有误，应为.torrent，确认继续？", "警告", MessageBoxButtons.OKCancel) = DialogResult.Cancel Then
                 Exit Sub
@@ -45,12 +46,28 @@ Public Class Form1
                             If t.Pieces Is Nothing Then Throw New Exception("文件无效")
                             If t.Pieces.Length = 0 Then Throw New Exception("文件无效")
                             If t.Pieces.Length Mod 20 <> 0 Then Throw New Exception("文件无效")
+                            Dim Skip As Boolean = False
+                            Dim Matched As Boolean = False
                             For Each k As IList(Of String) In t.Trackers
                                 For j As Integer = 0 To k.Count - 1
-                                    k(j) = k(j).Replace(TextBox3.Text, TextBox4.Text)
+                                    For Each KW As String In SkipKW
+                                        If k(j).Contains(KW) Then
+                                            Skip = True
+                                            Info("匹配关键词 " & KW & " 跳过当前文件")
+                                            Exit Try
+                                        End If
+                                    Next
+                                    If k(j).Contains(TextBox3.Text) Then
+                                        Matched = True
+                                        k(j) = k(j).Replace(TextBox3.Text, TextBox4.Text)
+                                    End If
                                     ' k(j) = k(j)
                                 Next
                             Next
+                            If Not Matched Then
+                                Info("未找到关键词，跳过当前文件")
+                                Exit Try
+                            End If
                             If CheckBox1.Checked Then
                                 Dim bakpath As String = My.Computer.FileSystem.CombinePath(f.DirectoryName, "Backup_" & tnow)
                                 bakpath = My.Computer.FileSystem.CombinePath(bakpath, f.Name)
@@ -60,7 +77,7 @@ Public Class Form1
                             Dim s As New IO.FileStream(f.FullName, IO.FileMode.Create)
                             t.EncodeTo(s)
                             s.Close()
-                            Info("OK")
+                            Info("替换完成")
                         Catch ex As Exception
                             Info(ex.ToString)
                         End Try
@@ -92,6 +109,7 @@ Public Class Form1
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Dim T1 As String = TextBox1.Text
         Dim T2 As String = TextBox2.Text
+        Dim SkipKW() As String = TextBox5.Text.Split({"|"}, StringSplitOptions.RemoveEmptyEntries)
         If Not T2.EndsWith(".fastresume") Then
             If MessageBox.Show("文件后缀似乎有误，应为.fastresume，确认继续？", "警告", MessageBoxButtons.OKCancel) = DialogResult.Cancel Then
                 Exit Sub
@@ -119,7 +137,14 @@ Public Class Form1
                         Try
                             Info("[" & i & "/" & flist.Length & "]" & f.FullName)
                             Dim t() As Byte = My.Computer.FileSystem.ReadAllBytes(f.FullName)
-
+                            Dim ts As String = My.Computer.FileSystem.ReadAllText(f.FullName)
+                            ts = ts.Substring(ts.IndexOf("trackersll"))
+                            For Each KW As String In SkipKW
+                                If ts.Contains(KW) Then
+                                    Info("匹配关键词 " & KW & " 跳过当前文件")
+                                    Exit Try
+                                End If
+                            Next
                             If t.Length = 0 Then Throw New Exception("文件无效")
 
                             Dim RA() As Byte = System.Text.Encoding.UTF8.GetBytes(TextBox3.Text)
@@ -146,7 +171,10 @@ Public Class Form1
                                     Replaced += 1
                                 End If
                             End While
-                            If Replaced = 0 Then Throw New Exception("未匹配到目标文本")
+                            If Replaced = 0 Then
+                                Info("未匹配到目标文本")
+                                Exit Try
+                            End If
                             If Replaced > 1 Then Info("警告：匹配次数" & Replaced)
                             t = tout.ToArray()
                             tout = New IO.MemoryStream()

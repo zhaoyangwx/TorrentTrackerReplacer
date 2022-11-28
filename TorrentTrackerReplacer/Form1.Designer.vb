@@ -37,6 +37,8 @@ Partial Class Form1
         Me.CheckBox2 = New System.Windows.Forms.CheckBox()
         Me.TextBox2 = New System.Windows.Forms.ComboBox()
         Me.Button3 = New System.Windows.Forms.Button()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.TextBox5 = New System.Windows.Forms.TextBox()
         Me.SuspendLayout()
         '
         'Label1
@@ -131,11 +133,11 @@ Partial Class Form1
         Me.TextBoxInfo.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextBoxInfo.Location = New System.Drawing.Point(12, 94)
+        Me.TextBoxInfo.Location = New System.Drawing.Point(12, 120)
         Me.TextBoxInfo.Multiline = True
         Me.TextBoxInfo.Name = "TextBoxInfo"
         Me.TextBoxInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBoxInfo.Size = New System.Drawing.Size(860, 407)
+        Me.TextBoxInfo.Size = New System.Drawing.Size(860, 381)
         Me.TextBoxInfo.TabIndex = 10
         Me.TextBoxInfo.WordWrap = False
         '
@@ -182,11 +184,32 @@ Partial Class Form1
         Me.Button3.Text = "qb恢复文件"
         Me.Button3.UseVisualStyleBackColor = True
         '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(12, 96)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(29, 12)
+        Me.Label5.TabIndex = 15
+        Me.Label5.Text = "排除"
+        '
+        'TextBox5
+        '
+        Me.TextBox5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBox5.Location = New System.Drawing.Point(71, 94)
+        Me.TextBox5.Name = "TextBox5"
+        Me.TextBox5.Size = New System.Drawing.Size(741, 21)
+        Me.TextBox5.TabIndex = 16
+        Me.TextBox5.Text = "skyey|dmhy|.com|.win|.org|.si|.eu"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(884, 542)
+        Me.Controls.Add(Me.TextBox5)
+        Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.TextBox2)
         Me.Controls.Add(Me.CheckBox2)
@@ -223,4 +246,6 @@ Partial Class Form1
     Friend WithEvents CheckBox2 As CheckBox
     Friend WithEvents TextBox2 As ComboBox
     Friend WithEvents Button3 As Button
+    Friend WithEvents Label5 As Label
+    Friend WithEvents TextBox5 As TextBox
 End Class
